@@ -9,7 +9,7 @@ import glob from 'fast-glob';
 import mongoose from 'mongoose';
 
 config();
-const { PORT, DB_URL } = process.env;
+const { PORT, MONGODB_URI } = process.env;
 
 const app = express();
 const server = Server(app);
@@ -18,7 +18,10 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json());
 
-mongoose.connect(DB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connection
   .on('error', (error) => console.log(error))
