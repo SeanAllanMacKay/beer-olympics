@@ -146,6 +146,19 @@ export default () => {
     await fetchEvents();
   };
 
+  const shuffle = async (body) => {
+    const response = await fetch(`/api/events`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    await fetchEvents();
+  };
+
   const fetchEvents = async () => {
     try {
       const response = await fetch(`/api/events`);
@@ -444,7 +457,17 @@ export default () => {
                                     justifyContent: 'flex-end',
                                   }}
                                 >
-                                  <Button onClick={() => reseed({ _id })}>
+                                  <Button
+                                    onClick={() =>
+                                      shuffle({ _id, shuffle: true })
+                                    }
+                                  >
+                                    Shuffle
+                                  </Button>
+                                  <Button
+                                    type="primary"
+                                    onClick={() => reseed({ _id })}
+                                  >
                                     Re-Seed
                                   </Button>
                                 </div>

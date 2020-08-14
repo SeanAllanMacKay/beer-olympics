@@ -68,7 +68,7 @@ router
         randomOrder[j] = temp;
       }
 
-      const tournamentPairings = generatePairings(docs);
+      const tournamentPairings = generatePairings(randomOrder);
 
       Event.create(
         {
@@ -85,7 +85,7 @@ router
     });
   })
   .patch(async (req, res) => {
-    const { _id } = req.body;
+    const { _id, shuffle } = req.body;
 
     Team.find({}, (err, docs) => {
       if (err) return res.status(500).send({ success: false });
@@ -93,14 +93,29 @@ router
       Event.findOne({ _id }, (error, event) => {
         if (error) return res.status(500).send({ success: false });
 
-        const missing = docs.filter(
-          ({ _id }) =>
-            !event.order.filter(
-              (ord) => ord && ord._id.toString() === _id.toString()
-            ).length
-        );
+        if (shuffle) {
+          let randomOrder = docs;
 
-        event.rounds = generatePairings([...event.order, ...missing]);
+          for (let i = randomOrder.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * i);
+            const temp = randomOrder[i];
+            randomOrder[i] = randomOrder[j];
+            randomOrder[j] = temp;
+          }
+
+          event.rounds = generatePairings(randomOrder);
+
+          event.order = randomOrder;
+        } else {
+          const missing = docs.filter(
+            ({ _id }) =>
+              !event.order.filter(
+                (ord) => ord && ord._id.toString() === _id.toString()
+              ).length
+          );
+
+          event.rounds = generatePairings([...event.order, ...missing]);
+        }
 
         event.save();
 
