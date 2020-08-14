@@ -15,8 +15,7 @@ export default () => {
 
   return (
     <header className={headerContainer}>
-      <h1 className={headerText}>Constructable</h1>
-      <Nav />
+      <h1 className={headerText}>Beer-Olympics</h1>
     </header>
   );
 };

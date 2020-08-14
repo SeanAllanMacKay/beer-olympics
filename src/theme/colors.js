@@ -1,5 +1,5 @@
 module.exports = {
-  primaryColor: '#0D2C54',
+  primaryColor: '#1890ff',
   secondaryColor: 'green',
   tertiaryColor: 'blue',
   primaryTextColor: 'whitesmoke',

@@ -49,6 +49,13 @@ const frontendConfig = {
   devServer: {
     hot: true,
     historyApiFallback: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        secure: false,
+        changeOrigin: true,
+      },
+    },
   },
   module: {
     rules: [

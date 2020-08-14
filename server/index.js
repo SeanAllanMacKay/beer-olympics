@@ -28,7 +28,7 @@ mongoose.connection
   .once('open', () => {
     console.log('Database Connected!');
 
-    server.listen(PORT || 8080, (error) => {
+    server.listen(PORT || 8080, async (error) => {
       if (error) {
         console.log(error);
       } else {
@@ -37,7 +37,8 @@ mongoose.connection
         app.use(express.static(path.resolve('dist')));
 
         const ENDPOINT_DIR = path.resolve('server', 'routes');
-        glob
+
+        await glob
           .sync('**/*.js', { cwd: ENDPOINT_DIR })
           .forEach(async (fileName) => {
             let route;
@@ -53,10 +54,13 @@ mongoose.connection
               default: { router: handler },
             } = await import(`@routes/${fileName}`);
 
-            app.use(`api/${route}`, handler);
+            app.use(
+              `/api/${route[0] === '.' ? route.substring(2) : route}`,
+              handler
+            );
           });
 
-        app.get('*', (req, res) => {
+        app.get(/^((?!api).)*$/, (req, res) => {
           res.sendFile(path.resolve('dist', 'index.html'));
         });
       }
