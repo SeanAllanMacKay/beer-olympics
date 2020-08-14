@@ -68,7 +68,7 @@ router
         randomOrder[j] = temp;
       }
 
-      const tournamentPairings = generatePairings(randomOrder);
+      const tournamentPairings = generatePairings(docs);
 
       Event.create(
         {
@@ -85,43 +85,26 @@ router
     });
   })
   .patch(async (req, res) => {
-    const { _id, shuffle } = req.body;
+    const { _id } = req.body;
 
-    Event.findOne({ _id }, (error, event) => {
-      if (error) return res.status(500).send({ success: false });
+    Team.find({}, (err, docs) => {
+      if (err) return res.status(500).send({ success: false });
 
-      Team.find({}, (err, docs) => {
-        if (err) return res.status(500).send({ success: false });
+      Event.findOne({ _id }, (error, event) => {
+        if (error) return res.status(500).send({ success: false });
 
-        const equal = docs.length === event.order.length;
+        const missing = docs.filter(
+          ({ _id }) =>
+            !event.order.filter(
+              (ord) => ord && ord._id.toString() === _id.toString()
+            ).length
+        );
 
-        if (equal && shuffle) {
-          event.rounds = generatePairings(docs);
+        event.rounds = generatePairings([...event.order, ...missing]);
 
-          event.save();
+        event.save();
 
-          res.status(200).send({ success: true });
-        } else {
-          if (docs.length > event.order.length) {
-            event.order.push(
-              docs.filter(({ _id }) =>
-                event.order.filter(({ _id: _orderId }) => _orderId !== _id)
-              )[0]
-            );
-
-            console.log();
-
-            event.rounds = generatePairings(event.order);
-
-            console.log();
-
-            event.save();
-
-            res.status(200).send({ success: true });
-          } else {
-            res.status(500).send({ success: false });
-          }
-        }
+        res.status(200).send({ success: true });
       });
     });
   })
