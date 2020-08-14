@@ -13,6 +13,7 @@ const userSchema = new Schema(
         },
       ],
     ],
+    order: [Schema.Types.Mixed],
   },
   { collection: 'Game' }
 );
